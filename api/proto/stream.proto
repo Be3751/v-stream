@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "github.com/Be3751/v-stream/api/proto";
+
+service Stream {
+	rpc SendVideo (SendRequest) returns (stream SendResponse) {};
+}
+
+message SendRequest {
+	string videoId = 1;
+}
+
+message SendResponse {
+	string name = 1;
+	bytes video = 2;
+}
