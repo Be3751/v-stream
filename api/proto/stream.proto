@@ -1,9 +1,10 @@
 syntax = "proto3";
+package v_stream;
 
-option go_package = "github.com/Be3751/v-stream/api/proto";
+option go_package = "github.com/Be3751/v-stream/pkg/pb";
 
-service Stream {
-	rpc SendVideo (SendRequest) returns (stream SendResponse) {};
+service VideoStream {
+	rpc ReceiveVideo (SendRequest) returns (stream SendResponse) {};
 }
 
 message SendRequest {
