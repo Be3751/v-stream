@@ -9,6 +9,7 @@ import (
 	"os/signal"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	vstream "github.com/Be3751/v-stream"
 	"github.com/Be3751/v-stream/pkg/pb"
@@ -23,6 +24,8 @@ func main() {
 	srv := grpc.NewServer()
 
 	pb.RegisterVideoStreamServer(srv, NewMyServer())
+
+	reflection.Register(srv)
 
 	go func() {
 		log.Printf("start gRPC server port: %d", port)
