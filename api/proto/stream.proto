@@ -4,14 +4,14 @@ package v_stream;
 option go_package = "github.com/Be3751/v-stream/pkg/pb";
 
 service VideoStream {
-	rpc ReceiveVideo (SendRequest) returns (stream SendResponse) {};
+	rpc ReceiveVideo (VideoRequest) returns (stream VideoResponse);
 }
 
-message SendRequest {
+message VideoRequest {
 	string videoId = 1;
 }
 
-message SendResponse {
+message VideoResponse {
 	string name = 1;
 	bytes video = 2;
 }

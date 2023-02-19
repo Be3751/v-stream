@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VideoStreamClient interface {
-	ReceiveVideo(ctx context.Context, in *SendRequest, opts ...grpc.CallOption) (VideoStream_ReceiveVideoClient, error)
+	ReceiveVideo(ctx context.Context, in *VideoRequest, opts ...grpc.CallOption) (VideoStream_ReceiveVideoClient, error)
 }
 
 type videoStreamClient struct {
@@ -33,7 +33,7 @@ func NewVideoStreamClient(cc grpc.ClientConnInterface) VideoStreamClient {
 	return &videoStreamClient{cc}
 }
 
-func (c *videoStreamClient) ReceiveVideo(ctx context.Context, in *SendRequest, opts ...grpc.CallOption) (VideoStream_ReceiveVideoClient, error) {
+func (c *videoStreamClient) ReceiveVideo(ctx context.Context, in *VideoRequest, opts ...grpc.CallOption) (VideoStream_ReceiveVideoClient, error) {
 	stream, err := c.cc.NewStream(ctx, &VideoStream_ServiceDesc.Streams[0], "/v_stream.VideoStream/ReceiveVideo", opts...)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (c *videoStreamClient) ReceiveVideo(ctx context.Context, in *SendRequest, o
 }
 
 type VideoStream_ReceiveVideoClient interface {
-	Recv() (*SendResponse, error)
+	Recv() (*VideoResponse, error)
 	grpc.ClientStream
 }
 
@@ -57,8 +57,8 @@ type videoStreamReceiveVideoClient struct {
 	grpc.ClientStream
 }
 
-func (x *videoStreamReceiveVideoClient) Recv() (*SendResponse, error) {
-	m := new(SendResponse)
+func (x *videoStreamReceiveVideoClient) Recv() (*VideoResponse, error) {
+	m := new(VideoResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (x *videoStreamReceiveVideoClient) Recv() (*SendResponse, error) {
 // All implementations must embed UnimplementedVideoStreamServer
 // for forward compatibility
 type VideoStreamServer interface {
-	ReceiveVideo(*SendRequest, VideoStream_ReceiveVideoServer) error
+	ReceiveVideo(*VideoRequest, VideoStream_ReceiveVideoServer) error
 	mustEmbedUnimplementedVideoStreamServer()
 }
 
@@ -77,7 +77,7 @@ type VideoStreamServer interface {
 type UnimplementedVideoStreamServer struct {
 }
 
-func (UnimplementedVideoStreamServer) ReceiveVideo(*SendRequest, VideoStream_ReceiveVideoServer) error {
+func (UnimplementedVideoStreamServer) ReceiveVideo(*VideoRequest, VideoStream_ReceiveVideoServer) error {
 	return status.Errorf(codes.Unimplemented, "method ReceiveVideo not implemented")
 }
 func (UnimplementedVideoStreamServer) mustEmbedUnimplementedVideoStreamServer() {}
@@ -94,7 +94,7 @@ func RegisterVideoStreamServer(s grpc.ServiceRegistrar, srv VideoStreamServer) {
 }
 
 func _VideoStream_ReceiveVideo_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(SendRequest)
+	m := new(VideoRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -102,7 +102,7 @@ func _VideoStream_ReceiveVideo_Handler(srv interface{}, stream grpc.ServerStream
 }
 
 type VideoStream_ReceiveVideoServer interface {
-	Send(*SendResponse) error
+	Send(*VideoResponse) error
 	grpc.ServerStream
 }
 
@@ -110,7 +110,7 @@ type videoStreamReceiveVideoServer struct {
 	grpc.ServerStream
 }
 
-func (x *videoStreamReceiveVideoServer) Send(m *SendResponse) error {
+func (x *videoStreamReceiveVideoServer) Send(m *VideoResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
