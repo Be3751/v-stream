@@ -1,4 +1,4 @@
-package uni_stream_client
+package grpc_client
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	vstream "github.com/Be3751/v-stream"
+	"github.com/Be3751/v-stream/internal/config"
 	"github.com/Be3751/v-stream/pkg/pb"
 )
 
@@ -18,28 +18,28 @@ type MyClient interface {
 var _ MyClient = (*myClient)(nil)
 
 type myClient struct {
-	vclient pb.VideoStreamClient
+	config  config.ClientConfig
+	vClient pb.VideoStreamClient
 }
 
-func NewMyClient(v pb.VideoStreamClient) MyClient {
-	return &myClient{vclient: v}
+func NewMyClient(c config.ClientConfig, v pb.VideoStreamClient) MyClient {
+	return &myClient{
+		config:  c,
+		vClient: v,
+	}
 }
 
 func (c *myClient) RequestVideo(ctx context.Context, videoId string) {
 	req := &pb.VideoRequest{
 		VideoId: videoId,
 	}
-	stream, err := c.vclient.ReceiveVideo(ctx, req)
+	stream, err := c.vClient.ReceiveVideo(ctx, req)
 	if err != nil {
 		return
 	}
 
-	root, err := vstream.GetRootPath()
-	if err != nil {
-		return
-	}
 	fileName := "download.mp4"
-	f, err := os.Create(fmt.Sprintf("%s/media/out/%s", root, fileName))
+	f, err := os.Create(fmt.Sprintf("%s/media/out/%s", c.config.Root, fileName))
 	if err != nil {
 		return
 	}

@@ -2,16 +2,39 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
-	"github.com/Be3751/v-stream/internal/uni_stream_client"
+	vstream "github.com/Be3751/v-stream"
+	"github.com/Be3751/v-stream/internal/config"
+	"github.com/Be3751/v-stream/internal/grpc_client"
 	"github.com/Be3751/v-stream/pkg/pb"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
-	address := "localhost:8080"
+	conn, err := clientConnect("localhost:8080")
+	if err != nil {
+		log.Fatal(err)
+	}
+	client := pb.NewVideoStreamClient(conn)
+
+	root, err := vstream.GetRootPath()
+	if err != nil {
+		log.Fatal("failed to get the root path in this project")
+		return
+	}
+	config := config.ClientConfig{Root: root}
+
+	ctx := context.Background()
+
+	myClient := grpc_client.NewMyClient(config, client)
+	myClient.RequestVideo(ctx, "_re")
+}
+
+func clientConnect(address string) (*grpc.ClientConn, error) {
 	conn, err := grpc.Dial(
 		address,
 
@@ -19,12 +42,7 @@ func main() {
 		grpc.WithBlock(),
 	)
 	if err != nil {
-		log.Fatal("Connection failed.")
-		return
+		return nil, fmt.Errorf("Connection failed: %w", err)
 	}
-	defer conn.Close()
-
-	client := pb.NewVideoStreamClient(conn)
-	myClient := uni_stream_client.NewMyClient(client)
-	myClient.RequestVideo(context.Background(), "_re")
+	return conn, nil
 }
