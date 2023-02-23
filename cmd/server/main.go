@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"os"
@@ -12,6 +11,8 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	vstream "github.com/Be3751/v-stream"
+	"github.com/Be3751/v-stream/internal/config"
+	"github.com/Be3751/v-stream/internal/grpc_server"
 	"github.com/Be3751/v-stream/pkg/pb"
 )
 
@@ -21,59 +22,27 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	srv := grpc.NewServer()
+	server := grpc.NewServer()
 
-	pb.RegisterVideoStreamServer(srv, NewMyServer())
+	root, err := vstream.GetRootPath()
+	if err != nil {
+		return
+	}
+	config := config.ServerConfig{Root: root}
 
-	reflection.Register(srv)
+	myServer := grpc_server.NewMyServer(config)
+	pb.RegisterVideoStreamServer(server, myServer)
+
+	reflection.Register(server)
 
 	go func() {
 		log.Printf("start gRPC server port: %d", port)
-		srv.Serve(listener)
+		server.Serve(listener)
 	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	log.Println("stopping gRPC server...")
-	srv.GracefulStop()
-}
-
-type myServer struct {
-	pb.UnimplementedVideoStreamServer
-}
-
-func NewMyServer() *myServer {
-	return &myServer{}
-}
-
-func (s *myServer) ReceiveVideo(req *pb.VideoRequest, srv pb.VideoStream_ReceiveVideoServer) error {
-	root, err := vstream.GetRootPath()
-	if err != nil {
-		return err
-	}
-	fmt.Println(root)
-	fileName := fmt.Sprintf("/media/in/piyo%s.mp4", req.VideoId)
-	f, err := os.Open(fmt.Sprintf("%s/%s", root, fileName))
-	if err != nil {
-		return fmt.Errorf("failed to open a file: %w", err)
-	}
-	for {
-		videoBytes := make([]byte, 1024)
-		_, err := f.Read(videoBytes)
-		if err == io.EOF {
-			srv.Send(&pb.VideoResponse{
-				Name:  "",
-				Video: videoBytes,
-			})
-			break
-		} else if err != nil {
-			return fmt.Errorf("failed to read video bytes: %w", err)
-		}
-		srv.Send(&pb.VideoResponse{
-			Name:  "",
-			Video: videoBytes,
-		})
-	}
-	return nil
+	server.GracefulStop()
 }
