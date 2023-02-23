@@ -53,7 +53,7 @@ func (s *myServer) ReceiveVideo(req *pb.VideoRequest, srv pb.VideoStream_Receive
 		return err
 	}
 	fmt.Println(root)
-	fileName := fmt.Sprintf("piyo%s.mp4", req.VideoId)
+	fileName := fmt.Sprintf("/media/in/piyo%s.mp4", req.VideoId)
 	f, err := os.Open(fmt.Sprintf("%s/%s", root, fileName))
 	if err != nil {
 		return fmt.Errorf("failed to open a file: %w", err)
