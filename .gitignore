@@ -1,2 +1,3 @@
-*.mp4
+media/in/*.mp4
+media/out/*.mp4
 .DS_Store
