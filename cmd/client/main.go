@@ -42,7 +42,7 @@ func clientConnect(address string) (*grpc.ClientConn, error) {
 		grpc.WithBlock(),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("Connection failed: %w", err)
+		return nil, fmt.Errorf("connection failed: %w", err)
 	}
 	return conn, nil
 }
