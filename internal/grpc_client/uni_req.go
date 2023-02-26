@@ -60,6 +60,4 @@ func (c *myClient) RequestVideo(ctx context.Context, videoId string) {
 		}
 		fmt.Println(res)
 	}
-
-	return
 }
