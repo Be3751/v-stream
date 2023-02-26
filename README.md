@@ -16,7 +16,7 @@ $ go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 ```
 
 ## protoファイルからコードを自動生成する
-Protocol Buffersの生成
+サービスやメッセージの生成
 ```
 $ protoc -I=./api/proto \
 --go_out=:./pkg/pb \     
@@ -24,7 +24,7 @@ $ protoc -I=./api/proto \
 api/proto/stream.proto
 ```
 
-gRPCの生成
+gRPCクライアント/サーバーの生成
 ```
 $ protoc -I=./api/proto \
 --go-grpc_out=:./pkg/pb \
